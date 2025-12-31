@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<!--
+    Website Monitor Desktop Application
+    Developed by Acquibi
+    https://github.com/Acquibi
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Monitor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background: #0a0a0f;
+            color: #e8e8e8;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Cyberpunk-inspired animated background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(90deg, rgba(0, 255, 157, 0.03) 1px, transparent 1px),
+                linear-gradient(rgba(0, 255, 157, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            animation: gridMove 30s linear infinite;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 20%, rgba(0, 255, 157, 0.08), transparent 40%),
+                        radial-gradient(circle at 70% 80%, rgba(0, 180, 255, 0.06), transparent 40%);
+            animation: gradientShift 15s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes gridMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 20px 20px; }
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(10%, 10%) rotate(5deg); }
+        }
+
+        .app-container {
+            position: relative;
+            z-index: 1;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            padding: 20px 24px 14px;
+            background: rgba(10, 10, 15, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 2px solid rgba(0, 255, 157, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 255, 157, 0.1);
+        }
+
+        .header-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 20px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #00ff9d 0%, #00b4ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
+            animation: titlePulse 3s ease-in-out infinite;
+        }
+
+        @keyframes titlePulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+        }
+
+        .header-subtitle {
+            font-size: 10px;
+            color: #00ff9d;
+            margin-top: 4px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            opacity: 0.6;
+        }
+
+        .status-display {
+            padding: 28px 24px;
+            text-align: center;
+        }
+
+        .status-orb {
+            width: 130px;
+            height: 130px;
+            margin: 0 auto 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            position: relative;
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            filter: drop-shadow(0 0 20px currentColor);
+        }
+
+        .status-orb::before {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 50%;
+            padding: 3px;
+            background: linear-gradient(135deg, #00ff9d, #00b4ff);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .status-orb.active::before {
+            opacity: 1;
+            animation: orbPulse 2.5s ease-in-out infinite;
+        }
+
+        @keyframes orbPulse {
+            0%, 100% { 
+                transform: scale(1) rotate(0deg); 
+                opacity: 0.7; 
+            }
+            50% { 
+                transform: scale(1.08) rotate(180deg); 
+                opacity: 1; 
+            }
+        }
+
+        .status-orb.up {
+            background: radial-gradient(circle, rgba(0, 255, 157, 0.2), rgba(0, 255, 157, 0.05));
+            box-shadow: 0 0 50px rgba(0, 255, 157, 0.4), inset 0 0 30px rgba(0, 255, 157, 0.2);
+            color: #00ff9d;
+        }
+
+        .status-orb.down {
+            background: radial-gradient(circle, rgba(255, 50, 50, 0.2), rgba(255, 50, 50, 0.05));
+            box-shadow: 0 0 50px rgba(255, 50, 50, 0.4), inset 0 0 30px rgba(255, 50, 50, 0.2);
+            color: #ff3232;
+        }
+
+        .status-orb.idle {
+            background: radial-gradient(circle, rgba(100, 100, 120, 0.15), rgba(100, 100, 120, 0.05));
+            box-shadow: 0 0 40px rgba(100, 100, 120, 0.3), inset 0 0 20px rgba(100, 100, 120, 0.15);
+            color: #646478;
+        }
+
+        .status-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 12px;
+            color: #00ff9d;
+        }
+
+        .latency-display {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #00b4ff;
+            margin-bottom: 4px;
+            text-shadow: 0 0 15px rgba(0, 180, 255, 0.5);
+        }
+
+        .latency-label {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 0 24px 20px;
+        }
+
+        .stat-card {
+            background: rgba(10, 10, 20, 0.6);
+            border: 1px solid rgba(0, 255, 157, 0.2);
+            border-radius: 8px;
+            padding: 14px 10px;
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 157, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .stat-card:hover::before {
+            left: 100%;
+        }
+
+        .stat-card:hover {
+            border-color: rgba(0, 255, 157, 0.5);
+            background: rgba(10, 10, 20, 0.8);
+            transform: translateY(-2px);
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #00ff9d;
+            text-shadow: 0 0 10px rgba(0, 255, 157, 0.4);
+        }
+
+        .stat-label {
+            font-size: 9px;
+            color: #777;
+            margin-top: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .config-section {
+            padding: 0 24px 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .config-section::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .config-section::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .config-section::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 157, 0.3);
+            border-radius: 3px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 10px;
+            font-weight: 600;
+            color: #00ff9d;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 14px;
+            background: rgba(10, 10, 20, 0.7);
+            border: 1px solid rgba(0, 255, 157, 0.3);
+            border-radius: 6px;
+            color: #e8e8e8;
+            font-size: 12px;
+            font-family: 'Roboto Mono', monospace;
+            transition: all 0.3s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #00ff9d;
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.3);
+            background: rgba(10, 10, 20, 0.9);
+        }
+
+        .input-field::placeholder {
+            color: #555;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .btn {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+
+        .btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00ff9d, #00b4ff);
+            color: #0a0a0f;
+            box-shadow: 0 4px 20px rgba(0, 255, 157, 0.3);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(0, 255, 157, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 50, 50, 0.2);
+            color: #ff5050;
+            border: 1px solid rgba(255, 50, 50, 0.4);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: rgba(255, 50, 50, 0.3);
+            border-color: #ff5050;
+            transform: translateY(-2px);
+        }
+
+        .btn-test {
+            background: rgba(0, 180, 255, 0.15);
+            color: #00b4ff;
+            border: 1px solid rgba(0, 180, 255, 0.3);
+            grid-column: 1 / -1;
+        }
+
+        .btn-test:hover:not(:disabled) {
+            background: rgba(0, 180, 255, 0.25);
+            border-color: #00b4ff;
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 14px 20px;
+            background: rgba(10, 10, 20, 0.95);
+            border: 1px solid #00ff9d;
+            border-radius: 6px;
+            color: #00ff9d;
+            font-size: 11px;
+            box-shadow: 0 4px 20px rgba(0, 255, 157, 0.3);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .fade-out {
+            animation: fadeOut 0.3s ease-out forwards;
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateX(400px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-title">SITE MONITOR</div>
+            <div class="header-subtitle">Real-Time Status Tracking</div>
+        </div>
+
+        <!-- Status Display -->
+        <div class="status-display">
+            <div id="statusOrb" class="status-orb idle">⚪</div>
+            <div id="statusText" class="status-text">Idle</div>
+            <div id="latencyDisplay" class="latency-display">---</div>
+            <div class="latency-label">Response Time</div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div id="totalChecks" class="stat-value">0</div>
+                <div class="stat-label">Total Checks</div>
+            </div>
+            <div class="stat-card">
+                <div id="uptimeCount" class="stat-value">0</div>
+                <div class="stat-label">Uptime</div>
+            </div>
+            <div class="stat-card">
+                <div id="downtimeCount" class="stat-value">0</div>
+                <div class="stat-label">Downtime</div>
+            </div>
+        </div>
+
+        <!-- Configuration Section -->
+        <div class="config-section">
+            <div class="input-group">
+                <label class="input-label">Target URL</label>
+                <input 
+                    type="text" 
+                    id="targetUrl" 
+                    class="input-field" 
+                    placeholder="https://example.com"
+                    value="">
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">Discord Webhook URL</label>
+                <input 
+                    type="text" 
+                    id="webhookUrl" 
+                    class="input-field" 
+                    placeholder="https://discord.com/api/webhooks/..."
+                    value="">
+            </div>
+
+            <div class="button-group">
+                <button id="startBtn" class="btn btn-primary">
+                    Start Monitor
+                </button>
+                <button id="stopBtn" class="btn btn-secondary" disabled>
+                    Stop Monitor
+                </button>
+            </div>
+
+            <div class="button-group">
+                <button id="testBtn" class="btn btn-test">
+                    Send Test Notification
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application State
+        let isMonitoring = false;
+
+        // DOM Elements
+        const targetUrlInput = document.getElementById('targetUrl');
+        const webhookUrlInput = document.getElementById('webhookUrl');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const testBtn = document.getElementById('testBtn');
+        const statusOrb = document.getElementById('statusOrb');
+        const statusText = document.getElementById('statusText');
+        const latencyDisplay = document.getElementById('latencyDisplay');
+        const totalChecks = document.getElementById('totalChecks');
+        const uptimeCount = document.getElementById('uptimeCount');
+        const downtimeCount = document.getElementById('downtimeCount');
+
+        // Show notification
+        function showNotification(message, duration = 3000) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => notification.remove(), 300);
+            }, duration);
+        }
+
+        // Update UI with status
+        function updateStatus(data) {
+            const { status, latency, stats } = data;
+
+            // Update status orb
+            statusOrb.className = 'status-orb ' + status;
+            if (isMonitoring) {
+                statusOrb.classList.add('active');
+            }
+
+            if (status === 'up') {
+                statusOrb.textContent = '🟢';
+                statusText.textContent = 'Online';
+                statusText.style.color = '#00ff9d';
+            } else if (status === 'down') {
+                statusOrb.textContent = '🔴';
+                statusText.textContent = 'Offline';
+                statusText.style.color = '#ff3232';
+            } else {
+                statusOrb.textContent = '⚪';
+                statusText.textContent = 'Idle';
+                statusText.style.color = '#646478';
+            }
+
+            // Update latency
+            if (latency !== null && latency !== undefined) {
+                latencyDisplay.textContent = `${latency}ms`;
+            } else {
+                latencyDisplay.textContent = '---';
+            }
+
+            // Update stats
+            if (stats) {
+                totalChecks.textContent = stats.totalChecks || 0;
+                uptimeCount.textContent = stats.uptime || 0;
+                downtimeCount.textContent = stats.downtime || 0;
+            }
+        }
+
+        // Start monitoring
+        startBtn.addEventListener('click', async () => {
+            const targetUrl = targetUrlInput.value.trim();
+            const webhookUrl = webhookUrlInput.value.trim();
+
+            if (!targetUrl) {
+                showNotification('⚠️ Please enter a target URL');
+                return;
+            }
+
+            if (!webhookUrl) {
+                showNotification('⚠️ Please enter a Discord webhook URL');
+                return;
+            }
+
+            try {
+                const result = await window.electronAPI.startMonitoring({
+                    targetUrl,
+                    webhookUrl
+                });
+
+                if (result.success) {
+                    isMonitoring = true;
+                    startBtn.disabled = true;
+                    stopBtn.disabled = false;
+                    targetUrlInput.disabled = true;
+                    webhookUrlInput.disabled = true;
+                    showNotification('✓ Monitoring started');
+                }
+            } catch (error) {
+                showNotification('✗ Failed to start monitoring');
+                console.error(error);
+            }
+        });
+
+        // Stop monitoring
+        stopBtn.addEventListener('click', async () => {
+            try {
+                const result = await window.electronAPI.stopMonitoring();
+
+                if (result.success) {
+                    isMonitoring = false;
+                    startBtn.disabled = false;
+                    stopBtn.disabled = true;
+                    targetUrlInput.disabled = false;
+                    webhookUrlInput.disabled = false;
+                    
+                    // Reset display
+                    updateStatus({ status: 'idle', latency: null, stats: { totalChecks: 0, uptime: 0, downtime: 0 } });
+                    showNotification('✓ Monitoring stopped');
+                }
+            } catch (error) {
+                showNotification('✗ Failed to stop monitoring');
+                console.error(error);
+            }
+        });
+
+        // Test notification
+        testBtn.addEventListener('click', async () => {
+            const webhookUrl = webhookUrlInput.value.trim();
+
+            if (!webhookUrl) {
+                showNotification('⚠️ Please enter a Discord webhook URL');
+                return;
+            }
+
+            try {
+                const result = await window.electronAPI.sendTestNotification();
+
+                if (result.success) {
+                    showNotification('✓ Test notification sent to Discord');
+                } else {
+                    showNotification('✗ ' + result.message);
+                }
+            } catch (error) {
+                showNotification('✗ Failed to send test notification');
+                console.error(error);
+            }
+        });
+
+        // Listen for status updates from main process
+        window.electronAPI.onStatusUpdate((data) => {
+            updateStatus(data);
+        });
+
+        // Load saved config on startup
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const config = await window.electronAPI.getConfig();
+                if (config.targetUrl) targetUrlInput.value = config.targetUrl;
+                if (config.webhookUrl) webhookUrlInput.value = config.webhookUrl;
+                
+                if (config.isMonitoring) {
+                    isMonitoring = true;
+                    startBtn.disabled = true;
+                    stopBtn.disabled = false;
+                    targetUrlInput.disabled = true;
+                    webhookUrlInput.disabled = true;
+                    
+                    // Get current stats
+                    const stats = await window.electronAPI.getStats();
+                    updateStatus({ status: 'up', latency: stats.currentLatency, stats });
+                }
+            } catch (error) {
+                console.error('Failed to load config:', error);
+            }
+        });
+    </script>
+</body>
+</html>
