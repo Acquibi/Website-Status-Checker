@@ -1,4 +1,4 @@
-# Website Monitor Desktop App 🖥️
+# Website Monitor Desktop App 
 
 A professional cross-platform desktop application built with Electron.js for monitoring website uptime with Discord notifications. Features a sleek cyberpunk-inspired UI and runs silently in the system tray.
 
@@ -6,7 +6,7 @@ A professional cross-platform desktop application built with Electron.js for mon
 ![Electron](https://img.shields.io/badge/Electron-28.0.0-47848F?logo=electron)
 ![Node](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js)
 
-## ✨ Features
+##  Features
 
 - **Real-Time Monitoring**: Checks website status every 60 seconds
 - **Discord Integration**: Sends professional embedded notifications when status changes
@@ -16,7 +16,7 @@ A professional cross-platform desktop application built with Electron.js for mon
 - **Modern UI**: Cyberpunk-themed interface with live statistics
 - **Zero Configuration**: Simple setup with just a URL and webhook
 
-## 🎯 Key Specifications
+##  Key Specifications
 
 - **Heartbeat Interval**: 60 seconds
 - **Smart Notifications**: Only triggers on status change (UP ↔ DOWN)
@@ -25,7 +25,7 @@ A professional cross-platform desktop application built with Electron.js for mon
 - **Widget-Style UI**: Compact 400x600 window
 - **Background Operation**: Continues monitoring when window is closed
 
-## 📋 Prerequisites
+##  Prerequisites
 
 Before you begin, ensure you have the following installed:
 
@@ -33,7 +33,7 @@ Before you begin, ensure you have the following installed:
 - **npm** (comes with Node.js)
 - **Git** (optional, for cloning the repository)
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### 1. Clone or Download the Repository
 
@@ -66,7 +66,7 @@ The application window will open. You can now:
 2. Enter your Discord webhook URL
 3. Click "Start Monitor"
 
-## 🔔 Setting Up Discord Webhook
+##  Setting Up Discord Webhook
 
 1. Open your Discord server
 2. Go to Server Settings → Integrations → Webhooks
@@ -76,7 +76,7 @@ The application window will open. You can now:
 6. Copy the Webhook URL
 7. Paste it into the app
 
-## 🏗️ Building Executables
+##  Building Executables
 
 ### Build for Current Platform
 
@@ -108,7 +108,7 @@ Built applications will be in the `dist/` folder:
 - **macOS**: `dist/Website Monitor.dmg`
 - **Linux**: `dist/Website Monitor.AppImage`
 
-## 📦 Project Structure
+##  Project Structure
 
 ```
 website-monitor-desktop/
@@ -121,7 +121,7 @@ website-monitor-desktop/
 └── README.md           # This file
 ```
 
-## 🎨 UI Features
+##  UI Features
 
 - **Status Orb**: Visual indicator with animated effects
   - 🟢 Green: Website is UP
@@ -140,7 +140,7 @@ website-monitor-desktop/
   - Right-click for quick actions
   - Shows current status and latency
 
-## 🔧 Configuration
+##  Configuration
 
 ### In-App Settings
 
@@ -157,14 +157,14 @@ checkInterval: 60000,  // Monitoring interval in ms (60 seconds)
 timeout: 10000,        // Request timeout in ms (10 seconds)
 ```
 
-## 🛡️ Security Notes
+##  Security Notes
 
 - ✅ Context isolation enabled
 - ✅ Node integration disabled
 - ✅ Secure IPC communication via preload script
 - ✅ No data persistence (privacy-friendly)
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### App won't start
 
@@ -192,7 +192,7 @@ npm install -g electron-builder
 npm run build
 ```
 
-## 📊 Technical Details
+##  Technical Details
 
 ### Architecture
 
@@ -224,7 +224,7 @@ npm run build
 }
 ```
 
-## 🤝 Contributing
+##  Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
@@ -234,11 +234,11 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📝 License
+##  License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🎯 Roadmap
+##  Roadmap
 
 - [ ] Add multiple website monitoring
 - [ ] Customizable check intervals
@@ -248,7 +248,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [ ] Telegram integration
 - [ ] Custom notification sounds
 
-## 💡 Use Cases
+##  Use Cases
 
 - Monitor your personal website or blog
 - Track API endpoint availability
@@ -257,14 +257,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Development server status checks
 - Production environment monitoring
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - Built with [Electron](https://www.electronjs.org/)
 - HTTP requests via [Axios](https://axios-http.com/)
 - Icons from [Heroicons](https://heroicons.com/)
 - Fonts from [Google Fonts](https://fonts.google.com/)
 
-## 📧 Support
+##  Support
 
 If you have any questions or run into issues:
 - Open an issue on GitHub
